@@ -1,0 +1,31 @@
+{
+  "name": "bluen",
+  "version": "0.0.1",
+  "description": "Yet another Node.js library for interacting with Bluez on GNU/Linux",
+  "main": "./dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dotandl/bluen.git"
+  },
+  "author": "dotandl",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dotandl/bluen/issues"
+  },
+  "homepage": "https://github.com/dotandl/bluen#readme",
+  "scripts": {
+    "format": "prettier -w .",
+    "lint": "eslint --fix .",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.23.0",
+    "@typescript-eslint/parser": "^8.28.0",
+    "eslint": "^9.23.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-prettier": "^5.2.5",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.28.0"
+  }
+}
