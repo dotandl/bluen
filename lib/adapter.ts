@@ -5,7 +5,7 @@ interface AdapterEvents {
   change: []
 }
 
-interface DiscoveryFilter {
+export interface DiscoveryFilter {
   UUIDs: string[]
   RSSI: number
   Pathloss: number
@@ -215,6 +215,32 @@ export class Adapter extends EventEmitter<AdapterEvents> {
       bus
     )
 
+  public static async fromPath(path: string, bus: MessageBus = systemBus()) {
+    const proxy = await bus.getProxyObject('org.bluez', path)
+    const props = proxy.getInterface('org.freedesktop.DBus.Properties')
+
+    const getProp = (prop: string) => props.Get('org.bluez.Adapter1', prop)
+
+    return new Adapter(
+      path,
+      {
+        address: await getProp('Address'),
+        name: await getProp('Name'),
+        alias: await getProp('Alias'),
+        class: await getProp('Class'),
+        powered: await getProp('Powered'),
+        discoverable: await getProp('Discoverable'),
+        pairable: await getProp('Pairable'),
+        pairableTimeout: await getProp('PairableTimeout'),
+        discoverableTimeout: await getProp('DiscoverableTimeout'),
+        discovering: await getProp('Discovering'),
+        uuids: await getProp('UUIDs'),
+        modalias: await getProp('Modalias'),
+      },
+      bus
+    )
+  }
+
   /**
    * Starts device discovery.
    */
@@ -237,14 +263,13 @@ export class Adapter extends EventEmitter<AdapterEvents> {
 
   /**
    * Removes a given device from the adapter.
-   * @param device Device to be removed
+   * @param path Path of the device to be removed
    */
-  // TODO: add option to pass in device object
-  public async removeDevice(device: string) {
+  public async removeDevice(path: string) {
     const proxy = await this._bus.getProxyObject('org.bluez', this._path)
     const adapter = proxy.getInterface('org.bluez.Adapter1')
 
-    await adapter.RemoveDevice(device)
+    await adapter.RemoveDevice(path)
   }
 
   /**
@@ -275,10 +300,10 @@ export class Adapter extends EventEmitter<AdapterEvents> {
 
     propManager.on(
       'PropertiesChanged',
-      (iface, changed: { [key: string]: { value: unknown } }) => {
+      (iface, props: { [key: string]: { value: unknown } }) => {
         if (iface !== 'org.bluez.Adapter1') return
 
-        for (const [prop, { value }] of Object.entries(changed)) {
+        for (const [prop, { value }] of Object.entries(props)) {
           switch (prop) {
             case 'Address':
               this._address = value as string
