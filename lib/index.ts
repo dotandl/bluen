@@ -1,1 +1,2 @@
-export default 'dupa'
+export { Adapter } from './adapter'
+export { Bluez } from './bluez'
