@@ -37,6 +37,13 @@ export class Adapter extends EventEmitter<AdapterEvents> {
   }
 
   /**
+   * DBus message bus used to communicate with BlueZ.
+   */
+  public get bus(): MessageBus {
+    return this._bus
+  }
+
+  /**
    * MAC address.
    */
   public get address(): string {

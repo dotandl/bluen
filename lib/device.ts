@@ -37,6 +37,13 @@ export class Device extends EventEmitter<DeviceEvents> {
   }
 
   /**
+   * DBus message bus used to communicate with BlueZ.
+   */
+  public get bus(): MessageBus {
+    return this._bus
+  }
+
+  /**
    * Device name.
    */
   public get name(): string | null {
@@ -263,14 +270,10 @@ export class Device extends EventEmitter<DeviceEvents> {
   /**
    * Retrieves all devices managed by the adapter.
    * @param adapter Adapter to be used
-   * @param bus DBus' message bus to be used, defaults to the system bus
    * @returns List of devices managed by the adapter
    */
-  public static async allOfAdapter(
-    adapter: Adapter,
-    bus: MessageBus = systemBus()
-  ): Promise<Device[]> {
-    const proxy = await bus.getProxyObject('org.bluez', '/')
+  public static async allOfAdapter(adapter: Adapter): Promise<Device[]> {
+    const proxy = await adapter.bus.getProxyObject('org.bluez', '/')
     const objManager = proxy.getInterface('org.freedesktop.DBus.ObjectManager')
 
     const objects: [string, { [key: string]: { value: unknown } }][] =
@@ -282,7 +285,7 @@ export class Device extends EventEmitter<DeviceEvents> {
         )
         .map(([path, ifaces]) => [path, ifaces['org.bluez.Device1']])
 
-    return objects.map((o) => Device.fromDBusObject(o, bus))
+    return objects.map((o) => Device.fromDBusObject(o, adapter.bus))
   }
 
   /**
